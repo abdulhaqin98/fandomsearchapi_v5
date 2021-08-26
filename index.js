@@ -297,7 +297,7 @@ async function fetchMovies() {
               <h6 class="card-title my-auto col-md-6">${title[j]}</h6>
               <div class="col-md-2"></div>
               <h6 class="card-title my-auto col-md-1">${'~(' + countWords + ')'}</h6>
-              <button class="btn btn-primary" type="button" id=${link[j]} onclick="FNrawWikiPopUp(this)">#</button>
+              <button class="btn btn-primary" type="button" value=${link[j]} onclick="FNrawWikiPopUp(this)">#</button>
               <a href="${link[j]}" target="_blank" class="btn btn-primary p-2  col-md-1">Link</a>
               <button id=${link[j]} onclick='consoPut(this);' class="btn btn-primary mx-1 col-md-1">+</button>
             </div>
@@ -615,7 +615,7 @@ function syncWikiToFirebase() {
 async function FNrawWikiPopUp(e){
   // alert(url.id);
 
-  var url = e.id;
+  var url = e.value;
   var wiki = url.split('wiki/');
   var FNcontentArray = [];
 
