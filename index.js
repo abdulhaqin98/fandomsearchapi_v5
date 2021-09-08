@@ -11,6 +11,9 @@
 //     console.log(d);
 //   });
 
+// FNrawWikiPopUp -> Search Page
+// rawWikiPopUp -> Load Saved Words
+
 window.onload = function () {
 
   document.getElementById('btn01').addEventListener("click", fetchMovies);
@@ -68,8 +71,8 @@ const series = ['Friends', 'H.I.M.Y.M', 'The Office (US)', 'The Big Bang Theory'
   'Harry Potter', 'Breaking Bad', 'PIXAR', 'G.O.T', 'Lord of the Rings',
   'The Godfather', 'PotC', 'Sherlock', 'Dragonball', 'The Hunger Games',
   'M.C.U', 'Marvel Database', 'Batman', 'D.C. Database', 'D.C Movies', 'D.C. Extended Universe',
-  'Twilight Saga', 'T.A.A.H.M', 'Suits', 'Terminator', 'South Park','Star Wars',
-  'Pokemon', 'Bojack Horseman', 'Simpsons','Fast and Furious'];
+  'Twilight Saga', 'T.A.A.H.M', 'Suits', 'Terminator', 'South Park', 'Star Wars',
+  'Pokemon', 'Bojack Horseman', 'Simpsons', 'Fast and Furious'];
 
 var title;
 var link;
@@ -522,11 +525,11 @@ async function loadDB() {
           <h6 class="card-title my-auto col-md-1">${wCount}</h6>
           <h6 class="card-title my-auto col-md-3">${typeof wordAlt === 'string' && wordAlt.length > 1 ? prop + ' (' + wordAlt + ')' : prop
           }</h6>
-              <div class="col-md-4 my-auto">
+              <div class="col-md-4 my-auto" name='${prop}'>
               ${wordSynonym ? wordSynonym : ``
           }
               </div>
-              <button class="btn btn-primary" type="button" id="${prop}" onclick="rawWikiPopUp(this)">#</button>
+              <button class="btn btn-primary" type="button" id="${prop}" value="${wordSynonym ? wordSynonym : ``}" onclick="rawWikiPopUp(this)">#</button>
               ${wordData.map(item => {
             return "<a href='" + item + "' target='_blank' class='btn btn-primary px-3 col-md-1 mx-1'>Link</a>"
           }).join("")
@@ -612,7 +615,7 @@ function syncWikiToFirebase() {
 //   console.log('called');
 // }
 
-async function FNrawWikiPopUp(e){
+async function FNrawWikiPopUp(e) {
   // alert(url.id);
 
   var url = e.value;
@@ -650,12 +653,12 @@ async function FNrawWikiPopUp(e){
       // var kLength = Object.keys(workData).length;
 
       // for (var x = 0; x < kLength; x++) {
-        var x=0;
+      var x = 0;
 
-        navTabHtml += `<button class="nav-link" id="${navTabArrayAria[x]}" data-bs-toggle="tab" data-bs-target="#${navTabArray[x]}"
+      navTabHtml += `<button class="nav-link" id="${navTabArrayAria[x]}" data-bs-toggle="tab" data-bs-target="#${navTabArray[x]}"
         type="button" role="tab" aria-controls="${navTabArray[x]}" aria-selected="true">${wiki[1]}</button>`
 
-        navBodyHtml += `<div class="tab-pane fade p-3" id="${navTabArray[x]}" role="tabpanel" aria-labelledby="${navTabArrayAria[x]}">
+      navBodyHtml += `<div class="tab-pane fade p-3" id="${navTabArray[x]}" role="tabpanel" aria-labelledby="${navTabArrayAria[x]}">
                       ${workData}
                       </div>`
       // }
@@ -670,22 +673,23 @@ async function FNrawWikiPopUp(e){
 
     });
 
-    // console.log("line 639");
-    // console.log(FNcontentArray);
+  // console.log("line 639");
+  // console.log(FNcontentArray);
 
-    const rawDataModal = new bootstrap.Modal(document.getElementById('rawdataModal'));
-    rawDataModal.show();
+  const rawDataModal = new bootstrap.Modal(document.getElementById('rawdataModal'));
+  rawDataModal.show();
 }
 
 function rawWikiPopUp(e) {
 
   var getWord = e.id;
+  var WordValue = e.value;
   // .replace(/ /g,'');
   console.log(getWord);
 
   async function loadWiki() {
 
-    var url = 'https://mag1000gre-default-rtdb.europe-west1.firebasedatabase.app/wordContent/'+getWord+'/contentArray.json';
+    var url = 'https://mag1000gre-default-rtdb.europe-west1.firebasedatabase.app/wordContent/' + getWord + '/contentArray.json';
     console.log(url);
     var navTabArray = ['nav001', 'nav002', 'nav003'];
     var navTabArrayAria = ['nav001-tab', 'nav002-tab', 'nav003-tab'];
@@ -723,6 +727,19 @@ function rawWikiPopUp(e) {
                         </div>`
         }
 
+        navTabHtml += `<button class="nav-link" id="def-update" data-bs-toggle="tab" data-bs-target="#def-update-tab"
+          type="button" role="tab" aria-controls="def-update-tab" aria-selected="true">Word</button>`
+
+        navBodyHtml += `<div class="tab-pane fade p-3" id="def-update-tab" role="tabpanel" aria-labelledby="def-update">
+                          Word: <b>${getWord}</b>
+                          <br>
+                          Synonyms: <b>${WordValue}</b>
+                          <input type="text" class="form-control rounded my-4" placeholder="New Synonyms (optional)"
+                            aria-describedby="basic-addon2" id='def-text'>
+                          <button class="btn btn-primary" type="button" value=${getWord} id='def-btn'
+                             onclick="updateWordSynonym(this)">Update</button>
+                        </div>`
+
         document.getElementById('nav-tab').innerHTML = navTabHtml;
         document.getElementById('nav-tabContent').innerHTML = navBodyHtml;
 
@@ -730,6 +747,7 @@ function rawWikiPopUp(e) {
         navBodyHtml = '';
         data.length = 0;
         workData.length = 0;
+        getWord = '';
 
         // console.log(Object.keys(data).length);
         // console.log(data);
@@ -742,4 +760,25 @@ function rawWikiPopUp(e) {
   const rawDataModal = new bootstrap.Modal(document.getElementById('rawdataModal'));
   // const modalClose = document.getElementById('close-modal');
   rawDataModal.show();
+}
+
+async function updateWordSynonym(e) {
+
+  var getWord = e.value;
+  var udSynonym = document.getElementById('def-text').value;
+
+  await firebase.database().ref('words/' + getWord).update({
+    udSynonym
+  }).catch(err => {
+    console.log(err);
+    toastError = 1;
+  });
+
+  toastCall();
+
+  document.getElementById('def-text').value = '';
+  // Line 532: Set Button Value
+  document.getElementById(getWord).value = udSynonym;
+  // Line 528 Div . Does not change in view but updates
+  // document.getElementsByName(getWord).innerHTML = udSynonym;
 }
