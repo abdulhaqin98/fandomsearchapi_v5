@@ -11,8 +11,8 @@
 //     console.log(d);
 //   });
 
-// FNrawWikiPopUp -> Search Page
-// rawWikiPopUp -> Load Saved Words
+// FNrawWikiPopUp -> Search Page.
+// rawWikiPopUp -> Load Saved Words.
 
 window.onload = function () {
 
